@@ -1,18 +1,15 @@
 import cv2
 import numpy as np
-from PIL import Image, PngImagePlugin
 from pyautogui import screenshot
 import time
 
-"""
-find_image by trueToastedCode
-version = 1.1
-"""
+# find_image by trueToastedCode
+# version = 1.1
 
 methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_CCORR', 'cv2.TM_CCORR_NORMED', 'cv2.TM_SQDIFF', 'cv2.TM_SQDIFF_NORMED']
 method = methods[1]
-threshold = 0.98
-get_middle= True
+threshold = 0.81 # 0.93
+get_middle = True
 mode = 0 # above threshold + 0 = best or 1 = all above
 
 def find_img(larger_img, smaller_img, result_fname = None):
@@ -67,15 +64,17 @@ def find_img(larger_img, smaller_img, result_fname = None):
 
     if mode == 0:
         return coordinates[0]
-    return coordinates
+    elif len(coordinates) != 0:
+        return coordinates
+    return None
 
 region = None
 
 def get_screenshot():
     return screenshot(region = (region))
 
-wait_apperance_in_s = 5
-attempts = 1
+wait_apperance_in_s = 1
+attempts = 60
 
 def find_img_on_screen(img, result_fname = None):
 
@@ -115,11 +114,12 @@ def find_img_on_screen(img, result_fname = None):
             if res == None:
                 print('Image {}/{} not found!'.format(i + 1, len(img)))
             else:
+                print('Image {}/{} found!'.format(i + 1, len(img)))
                 coordinates[i] = res
 
 
         # return results
-        if attempt + 1 == attempts:
+        if not (None in coordinates) or attempt + 1 == attempts:
             if is_list:
                 return coordinates
             elif coordinates[0] == None:
@@ -131,6 +131,5 @@ def find_img_on_screen(img, result_fname = None):
         if wait_apperance_in_s != None and wait_apperance_in_s != 0:
             print('Next Attempt: {}/{}, sleep {}s'.format(attempt + 2, attempts, wait_apperance_in_s))
             time.sleep(wait_apperance_in_s)
-
 
 #print(find_img_on_screen([Image.open('find.PNG'), Image.open('find2.PNG')], 'test.png'))
